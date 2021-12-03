@@ -177,36 +177,37 @@ class BiSManager {
         else { throw InvalidJobException() }
     }
 
-    fun getPlayerJobSlotNeed(player: String, job: String, slot: String): Boolean? {
+    fun getPlayerJobSlotNeed(player: String, job: String, slot: String): Boolean {
         if (job in jobTranslator) {
             if (slot in slotTranslator) {
-                return this.playerList[player]?.getSlotNeed(jobTranslator[job].toString(), slotTranslator[slot].toString())
+                return this.playerList[player]?.getSlotNeed(jobTranslator[job].toString(), slotTranslator[slot].toString()) == true
             }
             else { throw InvalidSlotException() }
         }
         else { throw InvalidJobException() }
     }
 
-    fun getAllSlots(slot: String) {
+    fun getAllSlots(slot: String): ArrayList<ArrayList<String>> {
         if (slot in slotTranslator) {
-            var slotList: ArrayList<ArrayList<String>> = arrayListOf()
-            for (player in this.playerList) {
-                var sl = arrayListOf<String>()
+            val slotList: ArrayList<ArrayList<String>> = arrayListOf()
+            for (player in this.playerList.keys) {
                 // go through each player's main, alt0, and alt1 and grab the slot info
                 // return as (playername, main/alt0/alt1, item, got)
+                for (i in arrayOf("main", "alt0", "alt1")) {
+                    val got = if (this.getPlayerJobSlotNeed(player, i, slot)) { "x" } else { "." }
+                    slotList.add(arrayListOf(player, i,
+                        this.getPlayerJobSlotItem(player, i, slot).toString(), got))
+                }
             }
+            return slotList
         }
         else { throw InvalidSlotException() }
     }
 }
 
 fun main(args: Array<String>) {
-    var x = BiSManager()
-    var y = BiSTracker("y")
-    var z = GearSet()
+    val x = BiSManager()
     x.addPlayer("a")
 //    for (pl in x.playerList) { println(pl) }
-    (z.setItem("weapon", "exarchic cane or whatever"))
-    println(z.getItem("weapon"))
-    x.getAllSlots("")
+    x.getAllSlots("head")
 }
